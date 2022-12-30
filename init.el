@@ -63,3 +63,17 @@
   :custom ((doom-modeline-height 15)))
 
 (ivy-mode)
+
+;; ----------------------------------------------------------------------------
+;;  korean font setting - cygwin emacs does not support
+;; ----------------------------------------------------------------------------
+;; need to install Nanum gothic function first as below
+;; sudo apt-get install -y fontconfig
+;; curl -o nanumfont.zip http://cdn.naver.com/naver/NanumFont/fontfiles/NanumFont_TTF_ALL.zip 
+;; sudo unzip -d /usr/share/fonts/nanum nanumfont.zip
+;; ----------------------------------------------------------------------------
+(set-language-environment "Korean")
+(prefer-coding-system 'utf-8)
+(setq default-input-method "korean-hangul")
+(global-set-key (kbd "<S-SPC>") 'toggle-input-method)
+(set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
