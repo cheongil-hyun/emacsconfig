@@ -38,9 +38,11 @@
 
 ;; (use-package command-log-mode)
 
+(use-package swiper)
+
 (use-package ivy
   :diminish
-  :bind (;; ("C-s" . swiper)
+  :bind (("C-s" . swiper)
          :map ivy-minibuffer-map
          ("TAB" . ivy-alt-done)	
          ("C-l" . ivy-alt-done)
