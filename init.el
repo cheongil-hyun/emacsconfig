@@ -1,4 +1,3 @@
-
 (setq inhibit-startup-message t)
 
 (scroll-bar-mode -1)        ; Disable visible scrollbar
@@ -10,6 +9,31 @@
 
 ;; Set up the visible bell
 (setq visible-bell t)
+
+;; ----------------------------------------------------------------------------
+;; Compilation output buffer auto scroll
+;; ----------------------------------------------------------------------------
+(setq compilation-scroll-output t)
+
+;; ----------------------------------------------------------------------------
+;; emacs auto reloading when file was changed from external program
+;; ----------------------------------------------------------------------------
+(global-auto-revert-mode 1)
+
+;; ----------------------------------------------------------------------------
+;; Yes and No
+;; ----------------------------------------------------------------------------
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; ----------------------------------------------------------------------------
+;; disable the backup
+;; ----------------------------------------------------------------------------
+(setq backup-inhibited t)
+
+;; ----------------------------------------------------------------------------
+;; disable auto save files
+;; ----------------------------------------------------------------------------
+(setq auto-save-default nil)
 
 ;; (set-face-attribute 'default nil :font "Fira Code Retina" :height 280)
 
@@ -55,16 +79,54 @@
          :map ivy-reverse-i-search-map
          ("C-k" . ivy-previous-line)
          ("C-d" . ivy-reverse-i-search-kill))
-  ;; :config
-  ;; (ivy-mode t)
-  )
+  :config
+  (ivy-mode 1))
 
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 
-(ivy-mode)
+;;------------------------------------------------------------------------
+;; org mode Settings
+;;------------------------------------------------------------------------
+(require 'org)
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(setq org-log-done t)
+;; setting org files for org-agenda
+(setq org-agenda-files (list "~/org/Task.org" "~/org/Schedule.org" "~/org/notes.org" "~/org/project.org"))
+
+(setq org-directory "~/org/")
+(setq org-default-notes-file (concat org-directory "/notes.org"))
+(define-key global-map "\C-cc" 'org-capture)
+
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline "~/org/Task.org" "Tasks")
+		 "* TODO %?\n  %i\n  %a")
+        ("i" "Ideas" entry (file+datetree "~/org/notes.org")
+		 "* %?\nIdeas %U\n  %i\n  %a")))
+
+;; ----------------------------------------------------------------------------
+;; org mode auto indent mode enable
+;; ----------------------------------------------------------------------------
+(add-hook 'org-mode-hook
+          (lambda ()
+            (org-indent-mode t)
+	    (auto-fill-mode 1)
+	    )
+          t)
+
+;;------------------------------------------------------------------------
+;; shell-pop
+;;------------------------------------------------------------------------
+(load-file "~/.emacs.d/packages/shell-pop.el")
+(require 'shell-pop)
+(shell-pop-set-internal-mode "eshell")
+(shell-pop-set-internal-mode-shell "/bin/bash")
+(shell-pop-set-window-height 60) ; the number for the percentage of the selected window.
+(global-set-key [f10] 'shell-pop)
 
 ;; ----------------------------------------------------------------------------
 ;;  korean font setting - cygwin emacs does not support
