@@ -1,3 +1,6 @@
+;; ----------------------------------------------------------------------------
+;; Configuration for basics 
+;; ----------------------------------------------------------------------------
 (setq inhibit-startup-message t)
 
 (scroll-bar-mode -1)        ; Disable visible scrollbar
@@ -46,7 +49,9 @@
 ;; Make ESC quit prompts
 ;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+;; ----------------------------------------------------------------------------
 ;; Initialize package sources
+;; ----------------------------------------------------------------------------
 (require 'package)
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -76,6 +81,9 @@
 
 ;; (use-package command-log-mode)
 
+;; ----------------------------------------------------------------------------
+;; Useful UI Packages swiper, ivy, doom-modeline, which-key, counsel, ivy-rich, helpful
+;; ----------------------------------------------------------------------------
 (use-package swiper)
 
 (use-package ivy
@@ -182,17 +190,27 @@
 (prefer-coding-system 'utf-8)
 (setq default-input-method "korean-hangul")
 (global-set-key (kbd "<S-SPC>") 'toggle-input-method)
-(set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(helpful counsel ivy-rich which-key use-package swiper doom-modeline)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
+
+;; ----------------------------------------------------------------------------
+;; ediff set default to horizontally
+;; ----------------------------------------------------------------------------
+(setq ediff-split-window-function 'split-window-horizontally
+      ediff-window-setup-function 'ediff-setup-windows-plain)
+
+;; ----------------------------------------------------------------------------
+;; emacs server settings
+;; ----------------------------------------------------------------------------
+(when (equal window-system 'w32)
+  (require 'server)
+  ;; Suppress error directory ~/.emacs.d/server is unsafe on windows.
+  (defun server-ensure-safe-dir (dir) "Noop" t)
+  (server-start)
+  (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
+  ;; ----------------------------------------------------------------------------
+  ;; path setting for windows
+  ;; ----------------------------------------------------------------------------
+  (setenv "PATH" (concat "C:/emacs/emacs-28.2/bin;C:/Program Files/Git/usr/bin;" (getenv "PATH")))
+  (setq exec-path (append '("C:/emacs/emacs-28.2/bin") exec-path))
+  (setq exec-path (append '("C:/Program Files/Git/usr/bin") exec-path))
+)
