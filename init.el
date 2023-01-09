@@ -190,7 +190,8 @@
 (prefer-coding-system 'utf-8)
 (setq default-input-method "korean-hangul")
 (global-set-key (kbd "<S-SPC>") 'toggle-input-method)
-;; (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
+(when (equal system-type 'gnu/linux)
+  (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding")))
 
 ;; ----------------------------------------------------------------------------
 ;; ediff set default to horizontally
