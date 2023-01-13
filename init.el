@@ -167,6 +167,7 @@
 	    (auto-fill-mode 1)
 	    )
           t)
+(require 'org-tempo)			;enable the template in org mode
 
 ;;------------------------------------------------------------------------
 ;; shell-pop
