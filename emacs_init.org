@@ -1,0 +1,277 @@
+#+title: Emacs configuration automatic creation
+#+property: header-args:emacs-lisp :tangle ./init.el
+* Emacs Configuration for auto generation
+** Basic Configurations
+Below items are basic configuraion for emacs usage
+
+#+begin_src emacs-lisp
+  ;; ----------------------------------------------------------------------------
+  ;; Configuration for basics 
+  ;; ----------------------------------------------------------------------------
+  (setq inhibit-startup-message t)
+
+  (scroll-bar-mode -1)        ; Disable visible scrollbar
+  (tool-bar-mode -1)          ; Disable the toolbar
+  (tooltip-mode -1)           ; Disable tooltips
+  (set-fringe-mode 10)        ; Give some breathing room
+
+  (menu-bar-mode -1)            ; Disable the menu bar
+
+  ;; Set up the visible bell
+  (setq visible-bell t)
+
+  ;; ----------------------------------------------------------------------------
+  ;; Compilation output buffer auto scroll
+  ;; ----------------------------------------------------------------------------
+  (setq compilation-scroll-output t)
+
+  ;; ----------------------------------------------------------------------------
+  ;; emacs auto reloading when file was changed from external program
+  ;; ----------------------------------------------------------------------------
+  (global-auto-revert-mode 1)
+
+  ;; ----------------------------------------------------------------------------
+  ;; Yes and No
+  ;; ----------------------------------------------------------------------------
+  (defalias 'yes-or-no-p 'y-or-n-p)
+
+  ;; ----------------------------------------------------------------------------
+  ;; disable the backup
+  ;; ----------------------------------------------------------------------------
+  (setq backup-inhibited t)
+
+  ;; ----------------------------------------------------------------------------
+  ;; disable auto save files
+  ;; ----------------------------------------------------------------------------
+  (setq auto-save-default nil)
+
+#+end_src
+
+** Theme and Font Configuration
+
+#+begin_src emacs-lisp
+  ;; if you set the font, you need to install "Fira Code Retina" or 
+  ;; you need to change the installed font name and enable below one
+  ;; (set-face-attribute 'default nil :font "Fira Code Retina" :height 280)
+
+  (load-theme 'wombat)			; you can change it you want
+#+end_src
+
+** Package Configurations 
+set the package source and install use-package when it is not
+installed
+#+begin_src emacs-lisp
+
+  ;; ----------------------------------------------------------------------------
+  ;; Initialize package sources
+  ;; ----------------------------------------------------------------------------
+  (require 'package)
+
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")))
+
+  (package-initialize)
+  (unless package-archive-contents
+   (package-refresh-contents))
+
+  ;; Initialize use-package on non-Linux platforms
+  (unless (package-installed-p 'use-package)
+     (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+
+#+end_src
+
+** Number Display mode in screen
+emacs will display line number at left area and will not display org,
+term, shell and eshell 
+
+#+begin_src emacs-lisp
+  ;; ----------------------------------------------------------------------------
+  ;; line number display and column number mode
+  ;; ----------------------------------------------------------------------------
+  (column-number-mode) 			; Display Column number in bottom 
+  (global-display-line-numbers-mode t)	; Display line number in left side (similar to vim)
+
+  ;; Disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+#+end_src
+
+** Useful UI package setting 
+we decied to use ivy-mode, cause it is lighter than helm and more
+informations are available
+#+begin_src emacs-lisp
+;; ----------------------------------------------------------------------------
+;; Useful UI Packages swiper, ivy, doom-modeline, which-key, counsel, ivy-rich, helpful
+;; ----------------------------------------------------------------------------
+(use-package swiper)
+
+(use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)	
+         ("C-l" . ivy-alt-done)
+         ;; ("C-j" . ivy-next-line)
+         ;; ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ;; ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ;; ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (ivy-mode 1))
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
+
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
+
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+	 ("C-x b" . counsel-ibuffer)
+	 ("C-x C-f" . counsel-find-file)
+	 :map minibuffer-local-map
+	 ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (setq ivy-initial-inputs-alist nil))	;; Don't start searches with ^
+
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
+#+end_src
+
+** Org Mode Setting
+Org mode is the built-in package for gnu emacs. so I won't use the
+use-package grammar in this section
+
+*** Basic Org mode setting
+
+#+begin_src emacs-lisp
+  ;;------------------------------------------------------------------------
+  ;; org mode Settings
+  ;;------------------------------------------------------------------------
+  (require 'org)
+  (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+  (define-key global-map "\C-cl" 'org-store-link)
+  (define-key global-map "\C-ca" 'org-agenda)
+  (setq org-log-done t)
+  ;; setting org files for org-agenda
+  (setq org-agenda-files (list "~/org/Task.org" "~/org/Schedule.org" "~/org/notes.org" "~/org/project.org"))
+
+  (setq org-directory "~/org/")
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (define-key global-map "\C-cc" 'org-capture)
+
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline "~/org/Task.org" "Tasks")
+                   "* TODO %?\n  %i\n  %a")
+          ("i" "Ideas" entry (file+datetree "~/org/notes.org")
+                   "* %?\nIdeas %U\n  %i\n  %a")))
+
+#+end_src
+
+*** Org mode indent mode
+#+begin_src emacs-lisp
+  ;; ----------------------------------------------------------------------------
+  ;; org mode auto indent mode enable
+  ;; ----------------------------------------------------------------------------
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (org-indent-mode t)
+              (auto-fill-mode 1)
+              )
+            t)
+#+end_src
+
+*** Org mode template mode
+#+begin_src emacs-lisp
+  (require 'org-tempo)			;enable the template in org mode
+
+#+end_src
+
+** Korean Language Setup
+if you are not using korean language, then you can skip this areas
+#+begin_src emacs-lisp
+  ;; ----------------------------------------------------------------------------
+  ;;  korean font setting - cygwin emacs does not support
+  ;; ----------------------------------------------------------------------------
+  ;; need to install Nanum gothic function first as below
+  ;; sudo apt-get install -y fontconfig
+  ;; curl -o nanumfont.zip http://cdn.naver.com/naver/NanumFont/fontfiles/NanumFont_TTF_ALL.zip 
+  ;; sudo unzip -d /usr/share/fonts/nanum nanumfont.zip
+  ;; ----------------------------------------------------------------------------
+  (set-language-environment "Korean")
+  (prefer-coding-system 'utf-8)
+  (setq default-input-method "korean-hangul")
+  (global-set-key (kbd "<S-SPC>") 'toggle-input-method)
+  (when (equal system-type 'gnu/linux)
+    (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding")))
+
+#+end_src
+
+** ediff setup
+if you use a wide screen, the it will be helpful
+#+begin_src emacs-lisp
+  ;; ----------------------------------------------------------------------------
+  ;; ediff set default to horizontally
+  ;; ----------------------------------------------------------------------------
+  (setq ediff-split-window-function 'split-window-horizontally
+        ediff-window-setup-function 'ediff-setup-windows-plain)
+
+#+end_src
+
+** Windows setting 
+if you use the emacs in windows, then it will be helpful to use in
+windows
+1. Server setting to use the emacsclientw, you will need some document
+   in [[https://www.emacswiki.org/emacs/MsWindowsGlobalContextMenu][emacswiki for windows]]
+2. you need to install the git for windows or MSYS2 to use the rgrep
+   functionality in emacs
+   you will need to add path for find, grep command
+
+#+begin_src emacs-lisp
+;; ----------------------------------------------------------------------------
+;; emacs server settings
+;; ----------------------------------------------------------------------------
+(when (equal window-system 'w32)
+  (require 'server)
+  ;; Suppress error directory ~/.emacs.d/server is unsafe on windows.
+  (defun server-ensure-safe-dir (dir) "Noop" t)
+  (server-start)
+  (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
+  ;; ----------------------------------------------------------------------------
+  ;; path setting for windows
+  ;; ----------------------------------------------------------------------------
+  (setenv "PATH" (concat "C:/emacs/emacs-28.2/bin;C:/Program Files/Git/usr/bin;" (getenv "PATH")))
+  (setq exec-path (append '("C:/emacs/emacs-28.2/bin") exec-path))
+  (setq exec-path (append '("C:/Program Files/Git/usr/bin") exec-path))
+)
+
+#+end_src
