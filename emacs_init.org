@@ -1,6 +1,6 @@
 #+title: Emacs configuration automatic creation
 #+property: header-args:emacs-lisp :tangle ./init.el
-* Emacs Configuration for auto generation
+* Emacs Configuration
 ** Basic Configurations
 Below items are basic configuraion for emacs usage
 
